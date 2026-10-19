@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cek Tubuh Ideal — Interaktif</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  :root {
+    --bg1: #0f0c29; --bg2: #302b63; --bg3: #24243e;
+    --card-bg: rgba(255,255,255,0.08);
+    --card-border: rgba(255,255,255,0.15);
+    --text: #ffffff;
+    --text-dim: rgba(255,255,255,0.6);
+    --input-bg: rgba(255,255,255,0.06);
+    --input-border: rgba(255,255,255,0.12);
+    --accent1: #f7971e; --accent2: #ffd200;
+    --kurus: #4facfe; --normal: #43e97b;
+    --berlebih: #f7971e; --obesitas: #f5576c;
+  }
+  [data-theme="light"] {
+    --bg1: #fef9f3; --bg2: #ffe8d6; --bg3: #ffd6ba;
+    --card-bg: rgba(255,255,255,0.72);
+    --card-border: rgba(0,0,0,0.08);
+    --text: #2b2b40;
+    --text-dim: rgba(0,0,0,0.55);
+    --input-bg: rgba(255,255,255,0.85);
+    --input-border: rgba(0,0,0,0.1);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+  html { scroll-behavior: smooth; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+    background-size: 200% 200%;
+    animation: bgShift 18s ease infinite;
+    display: flex;
+    padding: 20px;
+    color: var(--text);
+    transition: background 0.5s ease;
+    overflow-x: hidden;
+  }
+  @keyframes bgShift {
+    0%,100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  .theme-toggle {
+    position: fixed; top: 20px; right: 20px;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    border: 2px solid var(--card-border);
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 100;
+  }
+  .theme-toggle:hover { transform: scale(1.1) rotate(20deg); }
+  .container {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    padding: 32px 28px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+    animation: fadeUp 0.8s cubic-bezier(.2,.8,.3,1);
+    position: relative;
+    overflow: hidden;
+    margin: auto;
+  }
+  .container::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(247,151,30,0.06) 0%, transparent 60%);
+    animation: rotate 20s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes rotate { to { transform: rotate(360deg); } }
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(30px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  h1 {
+    text-align: center;
+    font-size: 1.65rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 3s linear infinite;
+    position: relative;
+    z-index: 1;
+  }
+  @keyframes shine { to { background-position: 200% center; } }
+  .subtitle {
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin-bottom: 22px;
+    position: relative;
+    z-index: 1;
+  }
+  .gender-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 1;
+    background: var(--input-bg);
+    padding: 6px;
+    border-radius: 18px;
+    border: 1px solid var(--input-border);
+  }
+  .gender-toggle button {
+    flex: 1;
+    padding: 12px 0;
+    border: none;
+    background: transparent;
+    border-radius: 13px;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(.2,.8,.3,1);
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+  .gender-toggle button.active {
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    color: #1a1a2e;
+    box-shadow: 0 6px 18px rgba(247,151,30,0.4);
+    transform: translateY(-1px);
+  }
+  .gender-toggle button:not(.active):hover { color: var(--text); }
+  .input-group {
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .input-group label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+  .input-group label .hint {
+    font-size: 0.72rem;
+    opacity: 0.7;
+    font-weight: 400;
+  }
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--input-bg);
+    border: 2px solid var(--input-border);
+    border-radius: 14px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  .input-wrapper:focus-within {
+    border-color: var(--accent1);
+    box-shadow: 0 0 0 4px rgba(247,151,30,0.15);
+  }
+  .input-wrapper i {
+    padding: 0 14px;
+    color: var(--text-dim);
+    font-size: 1rem;
+    transition: color 0.3s ease;
+  }
+  .input-wrapper:focus-within i { color: var(--accent1); }
+  .input-wrapper input {
+    flex: 1;
+    padding: 14px 0;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 600;
+    outline: none;
+  }
+  .input-wrapper input::placeholder { color: var(--text-dim); font-weight: 400; }
+  .input-wrapper input::-webkit-inner-spin-button,
+  .input-wrapper input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .input-wrapper .unit {
+    padding: 0 16px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent2);
+    background: rgba(247,151,30,0.12);
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+  }
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .btn-hitung {
+    flex: 2;
+    padding: 15px;
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    color: #1a1a2e;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s, box-shadow 0.25s;
+    box-shadow: 0 8px 24px rgba(247,151,30,0.35);
+  }
+  .btn-hitung:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(247,151,30,0.55);
+  }
+  .btn-hitung:active { transform: translateY(0) scale(0.98); }
+  .btn-reset {
+    flex: 1;
+    padding: 15px;
+    border: 2px solid var(--input-border);
+    border-radius: 16px;
+    background: var(--input-bg);
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .btn-reset:hover {
+    border-color: var(--obesitas);
+    color: var(--obesitas);
+    transform: translateY(-2px);
+  }
+  .btn-reset.pulse { animation: pulseReset 0.8s ease 3; }
+  @keyframes pulseReset {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245,87,108,0.7); border-color: var(--obesitas); color: var(--obesitas); }
+    50%      { box-shadow: 0 0 0 14px rgba(245,87,108,0); border-color: var(--obesitas); color: var(--obesitas); }
+  }
+  .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.6);
+    transform: scale(0);
+    animation: rippleAnim 0.6s linear;
+    pointer-events: none;
+  }
+  @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+  .error {
+    color: var(--obesitas);
+    font-size: 0.78rem;
+    text-align: center;
+    margin-top: 8px;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  .error.show { height: auto; opacity: 1; margin-top: 10px; }
+  .hasil {
+    margin-top: 24px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.6s ease, opacity 0.5s ease, margin 0.3s;
+    position: relative;
+    z-index: 1;
+  }
+  .hasil.show { max-height: 1800px; opacity: 1; }
+
+  /* Siluet */
+  .top-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+  .body-visual {
+    width: 120px; height: 190px;
+    margin: 0 auto 6px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.5s ease;
+  }
+  .body-visual::before {
+    content: '';
+    position: absolute;
+    inset: -25px;
+    border-radius: 50%;
+    background: radial-gradient(circle, currentColor, transparent 65%);
+    opacity: 0.2;
+    filter: blur(30px);
+    animation: glowPulse 2.5s ease-in-out infinite;
+    z-index: 0;
+    pointer-events: none;
+  }
+  @keyframes glowPulse {
+    0%, 100% { transform: scale(1); opacity: 0.2; }
+    50%      { transform: scale(1.25); opacity: 0.35; }
+  }
+  .body-visual svg {
+    width: 100%; height: 100%;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 6px 20px rgba(0,0,0,0.4));
+    transition: filter 0.5s ease;
+    animation: bodyFloat 3.5s ease-in-out infinite;
+  }
+  @keyframes bodyFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+  .body-visual.kurus    { color: var(--kurus); }
+  .body-visual.normal   { color: var(--normal); }
+  .body-visual.berlebih { color: var(--berlebih); }
+  .body-visual.obesitas { color: var(--obesitas); }
+  .body-visual .fill-shape { fill: currentColor; transition: fill 0.5s ease; }
+  .imt-value {
+    font-size: 3.2rem;
+    font-weight: 800;
+    line-height: 1;
+    text-align: center;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .imt-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 2px;
+    text-align: center;
+  }
+  .kategori-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    margin-top: 10px;
+    transition: all 0.4s ease;
+    animation: badgePop 0.5s ease;
+  }
+  @keyframes badgePop {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .kategori-badge.kurus    { background: var(--kurus); color: #fff; }
+  .kategori-badge.normal   { background: var(--normal); color: #1a1a2e; }
+  .kategori-badge.berlebih { background: var(--berlebih); color: #1a1a2e; }
+  .kategori-badge.obesitas { background: var(--obesitas); color: #fff; }
+
+  /* Selisih Card */
+  .selisih-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 16px;
+    margin: 16px 0 4px;
+    background: var(--input-bg);
+    border: 2px solid var(--input-border);
+    transition: all 0.4s ease;
+    animation: fadeUp 0.5s ease;
+  }
+  .selisih-card.kurus    { background: rgba(79,172,254,0.15); border-color: var(--kurus); }
+  .selisih-card.normal   { background: rgba(67,233,123,0.15); border-color: var(--normal); }
+  .selisih-card.berlebih { background: rgba(247,151,30,0.15); border-color: var(--berlebih); }
+  .selisih-card.obesitas { background: rgba(245,87,108,0.15); border-color: var(--obesitas); }
+  .selisih-icon {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    animation: iconSpin 0.6s ease;
+  }
+  @keyframes iconSpin {
+    from { transform: rotate(-180deg) scale(0); }
+    to   { transform: rotate(0) scale(1); }
+  }
+  .selisih-card.kurus    .selisih-icon { background: var(--kurus); color: #fff; }
+  .selisih-card.normal   .selisih-icon { background: var(--normal); color: #1a1a2e; }
+  .selisih-card.berlebih .selisih-icon { background: var(--berlebih); color: #1a1a2e; }
+  .selisih-card.obesitas .selisih-icon { background: var(--obesitas); color: #fff; }
+  .selisih-text { flex: 1; text-align: left; }
+  .selisih-label {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-bottom: 3px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .selisih-value {
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+  .selisih-card.kurus    .selisih-value { color: var(--kurus); }
+  .selisih-card.normal   .selisih-value { color: var(--normal); }
+  .selisih-card.berlebih .selisih-value { color: var(--berlebih); }
+  .selisih-card.obesitas .selisih-value { color: var(--obesitas); }
+
+  /* Gauge */
+  .gauge-wrap { margin: 18px 0 8px; }
+  .meter {
+    height: 16px;
+    border-radius: 12px;
+    background: var(--input-bg);
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .meter-fill {
+    height: 100%;
+    border-radius: 12px;
+    width: 0%;
+    transition: width 0.9s cubic-bezier(.2,.8,.3,1), background 0.5s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .meter-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmer 1.8s infinite;
+  }
+  @keyframes shimmer {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(100%); }
+  }
+  .meter-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    margin-top: 6px;
+    font-weight: 500;
+  }
+  .range-normal-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(67,233,123,0.12);
+    border: 1.5px dashed var(--normal);
+    animation: fadeUp 0.5s ease;
+  }
+  .range-normal-box i {
+    color: var(--normal);
+    font-size: 0.9rem;
+  }
+  .range-normal-label {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .range-normal-value {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--normal);
+    margin-left: 4px;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .info-card {
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 14px;
+    padding: 14px 12px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: help;
+    position: relative;
+  }
+  .info-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent1);
+    box-shadow: 0 8px 20px rgba(247,151,30,0.15);
+  }
+  .info-card .label {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .info-card .value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--accent2);
+    line-height: 1.1;
+  }
+  .info-card .sublabel {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-top: 6px;
+    font-style: italic;
+    line-height: 1.3;
+  }
+  .tooltip {
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    background: #1a1a2e;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s;
+    z-index: 10;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  }
+  .info-card:hover .tooltip {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  .tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%; left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1a1a2e;
+  }
+  .age-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: rgba(247,151,30,0.12);
+    border-left: 3px solid var(--berlebih);
+    border-radius: 12px;
+    font-size: 0.76rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    animation: fadeUp 0.5s ease;
+  }
+  .age-warning i {
+    color: var(--berlebih);
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  .age-warning strong { color: var(--accent2); }
+  .keterangan {
+    font-size: 0.78rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-top: 16px;
+    padding: 14px;
+    border-radius: 14px;
+    background: var(--input-bg);
+    border-left: 3px solid var(--accent1);
+    text-align: left;
+    animation: fadeUp 0.5s ease;
+  }
+  .keterangan strong { color: var(--accent2); }
+  .confetti {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--accent2);
+    top: -20px;
+    z-index: 999;
+    pointer-events: none;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    to { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+  }
+  .live-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    color: var(--normal);
+    font-weight: 500;
+    margin-left: 6px;
+  }
+  .live-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--normal);
+    animation: blink 1.5s infinite;
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; box-shadow: 0 0 0 0 var(--normal); }
+    50%     { opacity: 0.5; box-shadow: 0 0 0 5px transparent; }
+  }
+  @media (max-width: 480px) {
+    .container { padding: 26px 20px; }
+    h1 { font-size: 1.45rem; }
+    .imt-value { font-size: 2.6rem; }
+    .body-visual { width: 100px; height: 160px; }
+    .selisih-value { font-size: 1.2rem; }
+    .selisih-icon { width: 40px; height: 40px; font-size: 1rem; }
+    .info-card .value { font-size: 1.1rem; }
+    .range-normal-value { font-size: 0.85rem; }
+  }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="toggleTheme()" title="Ganti tema">
+  <i class="fa-solid fa-moon" id="theme-icon"></i>
+</button>
+
+<div class="container">
+  <h1><i class="fa-solid fa-heart-pulse"></i> Cek Tubuh Ideal</h1>
+  <p class="subtitle">Isi data — hasil & selisih berat muncul real-time ⚡</p>
+
+  <div class="gender-toggle">
+    <button id="btn-pria" class="active" onclick="setGender('pria', event)">
+      <i class="fa-solid fa-mars"></i> Pria
+    </button>
+    <button id="btn-wanita" onclick="setGender('wanita', event)">
+      <i class="fa-solid fa-venus"></i> Wanita
+    </button>
+  </div>
+
+  <!-- USIA — tanpa slider -->
+  <div class="input-group">
+    <label>
+      <span>Usia</span>
+      <span class="hint"><span class="live-indicator"><span class="live-dot"></span>live</span></span>
+    </label>
+    <div class="input-wrapper">
+      <i class="fa-solid fa-cake-candles"></i>
+      <input type="number" id="usia" placeholder="25" min="5" max="120" step="1" oninput="autoCalc()" />
+      <span class="unit">tahun</span>
+    </div>
+  </div>
+
+  <!-- TINGGI — tanpa slider -->
+  <div class="input-group">
+    <label>
+      <span>Tinggi Badan</span>
+      <span class="hint"><span class="live-indicator"><span class="live-dot"></span>live</span></span>
+    </label>
+    <div class="input-wrapper">
+      <i class="fa-solid fa-ruler-vertical"></i>
+      <input type="number" id="tinggi" placeholder="165" min="50" max="250" step="1" oninput="autoCalc()" />
+      <span class="unit">cm</span>
+    </div>
+  </div>
+
+  <!-- BERAT — tanpa slider -->
+  <div class="input-group">
+    <label>
+      <span>Berat Badan</span>
+      <span class="hint"><span class="live-indicator"><span class="live-dot"></span>live</span></span>
+    </label>
+    <div class="input-wrapper">
+      <i class="fa-solid fa-weight-scale"></i>
+      <input type="number" id="berat" placeholder="60" min="10" max="300" step="0.1" oninput="autoCalc()" />
+      <span class="unit">kg</span>
+    </div>
+  </div>
+
+  <div class="btn-row" id="btn-row">
+    <button class="btn-hitung" onclick="hitung(event)">
+      <i class="fa-solid fa-calculator"></i> Hitung Sekarang
+    </button>
+    <button class="btn-reset" id="btn-reset" onclick="resetAll(event)" title="Reset">
+      <i class="fa-solid fa-rotate-left"></i>
+    </button>
+  </div>
+
+  <p class="error" id="error-msg"></p>
+
+  <div class="hasil" id="hasil">
+    <div class="top-section" id="top-section">
+      <div class="body-visual" id="body-visual">
+        <svg viewBox="0 0 60 110" xmlns="http://www.w3.org/2000/svg">
+          <circle class="fill-shape" cx="30" cy="14" r="11"/>
+          <path class="fill-shape" d="M 17 28 Q 30 24 43 28 L 41 58 Q 30 62 19 58 Z"/>
+          <rect class="fill-shape" x="9" y="30" width="7" height="33" rx="3.5"/>
+          <rect class="fill-shape" x="44" y="30" width="7" height="33" rx="3.5"/>
+          <rect class="fill-shape" x="19" y="56" width="9" height="50" rx="4"/>
+          <rect class="fill-shape" x="32" y="56" width="9" height="50" rx="4"/>
+        </svg>
+      </div>
+      <div class="imt-value" id="imt-value">0.0</div>
+      <div class="imt-label">Indeks Massa Tubuh (kg/m²)</div>
+      <span class="kategori-badge" id="badge-kategori">—</span>
+    </div>
+
+    <div class="selisih-card" id="selisih-card">
+      <div class="selisih-icon" id="selisih-icon">
+        <i class="fa-solid fa-scale-balanced"></i>
+      </div>
+      <div class="selisih-text">
+        <div class="selisih-label" id="selisih-label">Selisih Berat Badan</div>
+        <div class="selisih-value" id="selisih-value">—</div>
+      </div>
+    </div>
+
+    <div class="gauge-wrap">
+      <div class="meter">
+        <div class="meter-fill" id="meter-fill"></div>
+      </div>
+      <div class="meter-labels">
+        <span>Kurus</span>
+        <span>Normal</span>
+        <span>Berlebih</span>
+        <span>Obesitas</span>
+      </div>
+      <div class="range-normal-box">
+        <i class="fa-solid fa-bullseye"></i>
+        <span class="range-normal-label">Range Normal:</span>
+        <span class="range-normal-value" id="range-normal">—</span>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="label">BB Ideal (Broca)</div>
+        <div class="value" id="bbi-broca">—</div>
+        <div class="sublabel" id="broca-sublabel">—</div>
+        <div class="tooltip" id="broca-tip">Rumus Broca Modifikasi</div>
+      </div>
+      <div class="info-card">
+        <div class="label">BB Ideal (IMT 22)</div>
+        <div class="value" id="bbi-imt">—</div>
+        <div class="sublabel">22 × tinggi(m)²</div>
+        <div class="tooltip">Titik tengah rentang IMT normal</div>
+      </div>
+    </div>
+
+    <div class="age-warning" id="age-warning" style="display:none;">
+      <i class="fa-solid fa-circle-info"></i>
+      <div id="age-warning-text"></div>
+    </div>
+
+    <div class="keterangan" id="keterangan"></div>
+  </div>
+</div>
+
+<script>
+  let gender = 'pria';
+  let animFrame = null;
+  let currentIMT = 0;
+  let scrollTimers = [];
+
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isLight = html.getAttribute('data-theme') === 'light';
+    html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+    document.getElementById('theme-icon').className =
+      isLight ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+  }
+
+  function cancelScrolls() {
+    scrollTimers.forEach(t => clearTimeout(t));
+    scrollTimers = [];
+  }
+  function scrollToCenter(el) {
+    const rect = el.getBoundingClientRect();
+    const targetY = window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2;
+    window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+  }
+  function scrollToBottomVisible(el, margin = 100) {
+    const rect = el.getBoundingClientRect();
+    const targetY = window.scrollY + rect.bottom - window.innerHeight + margin;
+    window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+  }
+  function scheduleScrolls() {
+    cancelScrolls();
+    const t1 = setTimeout(() => {
+      scrollToCenter(document.getElementById('body-visual'));
+      const t2 = setTimeout(() => {
+        scrollToBottomVisible(document.getElementById('btn-row'), 100);
+        const t3 = setTimeout(() => {
+          const resetBtn = document.getElementById('btn-reset');
+          resetBtn.classList.add('pulse');
+          setTimeout(() => resetBtn.classList.remove('pulse'), 3000);
+        }, 700);
+        scrollTimers.push(t3);
+      }, 7000);
+      scrollTimers.push(t2);
+    }, 700);
+    scrollTimers.push(t1);
+  }
+
+  function setGender(g, e) {
+    gender = g;
+    document.getElementById('btn-pria').classList.toggle('active', g === 'pria');
+    document.getElementById('btn-wanita').classList.toggle('active', g === 'wanita');
+    if (e) ripple(e);
+    autoCalc();
+  }
+
+  function autoCalc() {
+    const u = parseFloat(document.getElementById('usia').value);
+    const t = parseFloat(document.getElementById('tinggi').value);
+    const b = parseFloat(document.getElementById('berat').value);
+    if (!isNaN(u) && !isNaN(t) && !isNaN(b) && u >= 5 && t >= 50 && b >= 10) {
+      hitung(null, true);
+    }
+  }
+
+  function hitung(e, silent = false) {
+    if (e && !silent) ripple(e);
+    if (!silent) cancelScrolls();
+
+    const usia     = parseFloat(document.getElementById('usia').value);
+    const tinggiCm = parseFloat(document.getElementById('tinggi').value);
+    const beratKg  = parseFloat(document.getElementById('berat').value);
+    const errorEl  = document.getElementById('error-msg');
+
+    if (!usia || usia < 5 || usia > 120) {
+      errorEl.textContent = '⚠️ Masukkan usia yang valid (5–120 tahun).';
+      errorEl.classList.add('show');
+      document.getElementById('hasil').classList.remove('show');
+      return;
+    }
+    if (!tinggiCm || !beratKg || tinggiCm < 50 || beratKg < 10) {
+      errorEl.textContent = '⚠️ Masukkan tinggi (min. 50 cm) & berat (min. 10 kg) yang valid.';
+      errorEl.classList.add('show');
+      document.getElementById('hasil').classList.remove('show');
+      return;
+    }
+    errorEl.classList.remove('show');
+
+    const tinggiM = tinggiCm / 100;
+    const imt = beratKg / (tinggiM * tinggiM);
+    const beratMin = 18.5 * tinggiM * tinggiM;
+    const beratMax = 25.0 * tinggiM * tinggiM;
+
+    let kategori, badgeClass, warna, meterPersen;
+    if (imt < 18.5) {
+      kategori = 'Kurus'; badgeClass = 'kurus'; warna = 'var(--kurus)';
+      meterPersen = Math.min((imt / 18.5) * 25, 25);
+    } else if (imt <= 25.0) {
+      kategori = 'Normal'; badgeClass = 'normal'; warna = 'var(--normal)';
+      meterPersen = 25 + ((imt - 18.5) / (25.0 - 18.5)) * 25;
+    } else if (imt <= 27.0) {
+      kategori = 'Berlebih'; badgeClass = 'berlebih'; warna = 'var(--berlebih)';
+      meterPersen = 50 + ((imt - 25.0) / (27.0 - 25.0)) * 25;
+    } else {
+      kategori = 'Obesitas'; badgeClass = 'obesitas'; warna = 'var(--obesitas)';
+      meterPersen = Math.min(75 + ((imt - 27.0) / 10) * 25, 100);
+    }
+
+    let bbiBroca, brocaNote, brocaSub;
+    if (gender === 'pria') {
+      bbiBroca = tinggiCm < 160 ? tinggiCm - 100 : 0.9 * (tinggiCm - 100);
+      brocaNote = tinggiCm < 160
+        ? 'Pria TB < 160 cm: BBI = TB − 100'
+        : 'Pria TB ≥ 160 cm: BBI = 90% × (TB − 100)';
+      brocaSub = tinggiCm < 160 ? 'TB − 100 (pria < 160cm)' : '90% × (TB − 100)';
+    } else {
+      bbiBroca = tinggiCm < 150 ? tinggiCm - 100 : 0.85 * (tinggiCm - 100);
+      brocaNote = tinggiCm < 150
+        ? 'Wanita TB < 150 cm: BBI = TB − 100'
+        : 'Wanita TB ≥ 150 cm: BBI = 85% × (TB − 100)';
+      brocaSub = tinggiCm < 150 ? 'TB − 100 (wanita < 150cm)' : '85% × (TB − 100)';
+    }
+
+    const bbiImt = 22 * (tinggiM * tinggiM);
+
+    document.getElementById('hasil').classList.add('show');
+
+    animateNumber(currentIMT, imt, 400, (val) => {
+      document.getElementById('imt-value').textContent = val.toFixed(1);
+    });
+    currentIMT = imt;
+
+    const badge = document.getElementById('badge-kategori');
+    const icon = kategori === 'Kurus' ? 'fa-arrow-down'
+               : kategori === 'Normal' ? 'fa-check'
+               : kategori === 'Berlebih' ? 'fa-arrow-up'
+               : 'fa-triangle-exclamation';
+    badge.innerHTML = `<i class="fa-solid ${icon}"></i> ${kategori}`;
+    badge.className = 'kategori-badge ' + badgeClass;
+
+    document.getElementById('body-visual').className = 'body-visual ' + badgeClass;
+
+    const meterFill = document.getElementById('meter-fill');
+    meterFill.style.width = meterPersen + '%';
+    meterFill.style.background = warna;
+
+    document.getElementById('bbi-broca').textContent = bbiBroca.toFixed(1) + ' kg';
+    document.getElementById('broca-sublabel').textContent = brocaSub;
+    document.getElementById('broca-tip').textContent = brocaNote;
+    document.getElementById('bbi-imt').textContent = bbiImt.toFixed(1) + ' kg';
+
+    document.getElementById('range-normal').textContent =
+      `${beratMin.toFixed(1)} – ${beratMax.toFixed(1)} kg`;
+
+    const selisihCard  = document.getElementById('selisih-card');
+    const selisihIcon  = document.getElementById('selisih-icon');
+    const selisihLabel = document.getElementById('selisih-label');
+    const selisihValue = document.getElementById('selisih-value');
+
+    selisihCard.className = 'selisih-card ' + badgeClass;
+
+    if (kategori === 'Kurus') {
+      const kurang = beratMin - beratKg;
+      selisihIcon.innerHTML = '<i class="fa-solid fa-arrow-up"></i>';
+      selisihLabel.textContent = 'Kurang Berat Badan';
+      selisihValue.textContent = `+${kurang.toFixed(1)} kg`;
+    } else if (kategori === 'Normal') {
+      selisihIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+      selisihLabel.textContent = 'Berat Badan Ideal ✓';
+      selisihValue.textContent = 'Dalam Range';
+    } else {
+      const lebih = beratKg - beratMax;
+      selisihIcon.innerHTML = '<i class="fa-solid fa-arrow-down"></i>';
+      selisihLabel.textContent = 'Kelebihan Berat Badan';
+      selisihValue.textContent = `−${lebih.toFixed(1)} kg`;
+    }
+
+    const ageWarn = document.getElementById('age-warning');
+    const ageWarnText = document.getElementById('age-warning-text');
+    if (usia < 18) {
+      ageWarn.style.display = 'flex';
+      ageWarnText.innerHTML = `<strong>Usia ${usia} tahun (anak/remaja):</strong> IMT dewasa <strong>tidak sepenuhnya akurat</strong> untuk usia di bawah 18 tahun. Standar yang dipakai adalah persentil IMT menurut usia & jenis kelamin. Konsultasikan ke dokter anak untuk interpretasi tepat.`;
+    } else if (usia >= 65) {
+      ageWarn.style.display = 'flex';
+      ageWarnText.innerHTML = `<strong>Usia ${usia} tahun (lansia):</strong> Ambang IMT untuk lansia bisa sedikit berbeda. Nilai IMT 23–27 justru sering dianggap optimal untuk lansia. Diskusikan dengan dokter untuk interpretasi personal.`;
+    } else {
+      ageWarn.style.display = 'none';
+    }
+
+    let ket = '';
+    if (kategori === 'Kurus') {
+      const kurang = beratMin - beratKg;
+      ket = `<strong>💡 Saran:</strong> Berat badanmu <strong>${kurang.toFixed(1)} kg di bawah</strong> batas normal. Perlu menambah asupan gizi seimbang (protein, karbohidrat kompleks, lemak sehat) dan konsultasi ke ahli gizi.`;
+    } else if (kategori === 'Normal') {
+      ket = `<strong>🎉 Hebat!</strong> Berat badanmu di rentang ideal (${beratMin.toFixed(1)} – ${beratMax.toFixed(1)} kg). Pertahankan pola makan sehat, olahraga rutin, dan istirahat cukup.`;
+    } else if (kategori === 'Berlebih') {
+      const lebih = beratKg - beratMax;
+      ket = `<strong>⚡ Perhatian:</strong> Berat badanmu <strong>${lebih.toFixed(1)} kg di atas</strong> batas normal. Mulai atur pola makan dan tingkatkan aktivitas fisik untuk mencegah obesitas.`;
+    } else {
+      const lebih = beratKg - beratMax;
+      ket = `<strong>⚠️ Penting:</strong> Berat badanmu <strong>${lebih.toFixed(1)} kg di atas</strong> batas normal (obesitas). Disarankan konsultasi ke tenaga kesehatan untuk program penurunan berat badan yang aman.`;
+    }
+    ket += '<br><br><strong>Catatan:</strong> IMT adalah skrining awal, bukan diagnosis medis. Massa otot, usia, dan komposisi tubuh tetap perlu dipertimbangkan.';
+
+    document.getElementById('keterangan').innerHTML = ket;
+
+    if (!silent && kategori === 'Normal') {
+      fireConfetti();
+    }
+    if (!silent) {
+      scheduleScrolls();
+    }
+  }
+
+  function animateNumber(from, to, duration, cb) {
+    if (animFrame) cancelAnimationFrame(animFrame);
+    const start = performance.now();
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      cb(from + (to - from) * eased);
+      if (t < 1) animFrame = requestAnimationFrame(step);
+    }
+    animFrame = requestAnimationFrame(step);
+  }
+
+  function ripple(e) {
+    const btn = e.currentTarget;
+    if (!btn) return;
+    const circle = document.createElement('span');
+    const size = Math.max(btn.clientWidth, btn.clientHeight);
+    const rect = btn.getBoundingClientRect();
+    circle.style.width = circle.style.height = size + 'px';
+    circle.style.left = (e.clientX - rect.left - size / 2) + 'px';
+    circle.style.top  = (e.clientY - rect.top  - size / 2) + 'px';
+    circle.className = 'ripple';
+    btn.appendChild(circle);
+    setTimeout(() => circle.remove(), 600);
+  }
+
+  function fireConfetti() {
+    const colors = ['#43e97b', '#ffd200', '#f7971e', '#4facfe', '#f5576c', '#a78bfa'];
+    for (let i = 0; i < 60; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+      c.style.animationDelay = (Math.random() * 0.4) + 's';
+      c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      c.style.width = (6 + Math.random() * 8) + 'px';
+      c.style.height = (6 + Math.random() * 8) + 'px';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 3500);
+    }
+  }
+
+  function resetAll(e) {
+    ripple(e);
+    cancelScrolls();
+    document.getElementById('btn-reset').classList.remove('pulse');
+    document.getElementById('usia').value = '';
+    document.getElementById('tinggi').value = '';
+    document.getElementById('berat').value = '';
+    document.getElementById('hasil').classList.remove('show');
+    document.getElementById('error-msg').classList.remove('show');
+    currentIMT = 0;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const btn = document.querySelector('.btn-hitung');
+      const rect = btn.getBoundingClientRect();
+      hitung({
+        currentTarget: btn,
+        clientX: rect.left + rect.width / 2,
+        clientY: rect.top + rect.height / 2
+      });
+    }
+  });
+</script>
+</body>
+</html>
